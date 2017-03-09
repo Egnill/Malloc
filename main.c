@@ -3,16 +3,22 @@
 
 int main()
 {
-	IntVector *p = int_vector_new(6);
-	int i, j;
-	/*for (i = 0; i < 5; ++i) {
-		p -> data[i] = i + 1;
+	IntVector *p = int_vector_new(10);
+	int i, j, k;
+
+	p -> size = int_vector_get_size(p);
+	
+		int_vector_set_item(p, 5, 25);
+	
+	for (i = 0; i < 10; ++i) {
+		printf("%d ", p -> data[i]);
 	}
-	p -> size = int_vector_get_size(p);*/
-	int_vector_set_item(p, 7, 8);
-	printf("%d\n", p -> data[4]);
-	//printf("%d\n", p -> data);
+	printf("\n");
+	
+	int_vector_free(p);
+
 	free(p);
 	p = 0;
+	
 	return 0;
 }
