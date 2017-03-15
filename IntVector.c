@@ -34,7 +34,7 @@ int int_vector_get_item(const IntVector *v, size_t index)
 		printf("Выход за рамки вектора!");
 		return 0;
 	} else {
-		int q = v -> data[index];
+		int q = v -> data[index - 1];
 		return q;
 	}
 } //Элемент под номером index
@@ -45,6 +45,7 @@ void int_vector_set_item(IntVector *v, size_t index, int item)
 		printf("Выход за рамки вектора!");
 	} else {
 		v -> data[index - 1] = item;
+		v -> size = index;
 	}
 } //Присваивает элементу под index значеник item
 
@@ -62,13 +63,19 @@ int int_vector_push_back(IntVector *v, int item)
 {
 	if (v -> capacity == v -> size) {
 		v -> capacity = (v -> capacity) * 2;
-		v -> data = realloc(v -> data, (v -> capacity) * sizeof(int));
+		v -> data = realloc(v -> data, v -> capacity * sizeof(int));
 		v -> size = (v -> size) + 1;
-		v -> data[v -> size] = item;
+		v -> data[(v -> size) - 1] = item;
 	} else {
-		v -> data[(v -> size) + 1] = item;
+		v -> data[v -> size] = item;
+		v -> size = (v -> size) + 1;
 	}
-	return 0;
+
+	if (v -> data == NULL) {
+		return -1;
+	} else {
+		return 0;
+	}
 } //Добовляет элемент в конец массива
 
 void int_vector_pop_back(IntVector *v)
@@ -76,47 +83,119 @@ void int_vector_pop_back(IntVector *v)
 	if (v -> size == 0) {
 		printf("Действие не имеет смысла!");
 	} else {
-		v -> data[v -> size] = 0;
+		v -> data[(v -> size) - 1] = 0;
+		v -> size = (v -> size) - 1;
 	}
 } //Удаляет последний элемент из массива
 
 int int_vector_shrink_to_fit(IntVector *v)
 {
 	v -> data = realloc(v -> data, (v -> size) * sizeof(int));
-	return 0;
-	/*if (realloc(v -> data, (v -> size) * sizeof(int)) == 0) {
+	if (v -> data == NULL) {
 		return -1;
 	} else {
+		v -> capacity = v -> size;
 		return 0;
-	}*/
+	}
 } //Уменьшает ёмкость массива до его размера
 
 int int_vector_resize(IntVector *v, size_t new_size)
 {
-	/*if (new_size <= v -> size) {
-		printf("Для этого действия эта функция не подойдёт!");
-	} else {
-		if (realloc(v -> data, new_size * sizeof(int)) == 0) {
-			return -1;
+	int i = 0, k;
+	if (new_size > v -> capacity) {
+		v -> data = realloc(v -> data, new_size * sizeof(int));
+		if (v -> data == NULL) {
+			i = 1;
 		} else {
-			return 0;
+			for (k = (v -> size); k < new_size; ++k) {
+				v -> data[k] = 0;
+			}
+			v -> size = new_size;
+			v -> capacity = new_size;
 		}
-	}*/
-	v -> data = realloc(v -> data, new_size * sizeof(int));
-	return 0;
+	}
+
+	if (i == 1) {
+		return -1;
+	} else {
+		return 0;
+	}
 } //Изменяет размер массива
 
 int int_vector_reserve(IntVector *v, size_t new_capacity)
 {
-	/*if (new_capacity <= (v -> capacity)) {
-		printf("Действие не имеет смысла!");
-	} else {
-		if (realloc(v -> data, new_capacity * sizeof(int)) == 0) {
-			return -1;
-		} else {
-			return 0;
+	int i = 0;
+	if (new_capacity > v -> capacity) {
+		v -> data = realloc(v -> data, new_capacity * sizeof(int));
+		if (v -> data == NULL) {
+			 i = 1;
 		}
-	}*/
-	v -> data = realloc(v -> data, new_capacity * sizeof(int));
-	return 0;
+	}
+	if (i == 1) {
+		return -1;
+	} else {
+		v -> capacity = new_capacity;
+		return 0;
+	}
 } //Изменяет ёмкость массива
+
+void add_item(IntVector *v, size_t item)
+{
+	if (v -> size >= v -> capacity) {
+		printf("Addition not possible!");
+	} else {
+		v -> data[v -> size] = item;
+		(v -> size) += 1;
+	}
+}
+
+void MprintM(const IntVector *v)
+{
+	int i, j;
+
+	printf("+");
+	for (i = 0; i < v -> capacity; ++i) {
+		j = v -> data[i];
+		
+		if (j == 0) {
+			j = 1;
+		}
+
+		while (j != 0) {
+			printf("-");
+			j /= 10;
+		}
+		printf("+");
+	}
+	printf("\n");
+
+	printf("|");
+	for (i = 0; i < v -> capacity; ++i) {
+		if (v -> size > 0 && i <= (v -> size) - 1) {
+			printf("%d|", v -> data[i]);
+		} else {
+			printf(" |");
+		}
+	}
+	printf("\n");
+
+	printf("+");
+	for (i = 0; i < v -> capacity; ++i) {
+		j = v -> data[i];
+		
+		if (j == 0) {
+			j = 1;
+		}
+
+		while (j != 0) {
+			printf("-");
+			j /= 10;
+		}
+		printf("+");
+	}
+	printf("\n");
+
+	printf("Size: %d\n", v -> size);
+	printf("Capacity: %d\n", v -> capacity);
+	printf("\n");
+} //Вывод вектора

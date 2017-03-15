@@ -22,5 +22,7 @@ void int_vector_pop_back(IntVector *v);
 int int_vector_shrink_to_fit(IntVector *v);
 int int_vector_resize(IntVector *v, size_t new_size);
 int int_vector_reserve(IntVector *v, size_t new_capacity);
+void add_item(IntVector *v, size_t item);
+void MprintM(const IntVector *v);
 
 #endif
