@@ -6,19 +6,27 @@
 IntVector *int_vector_new(size_t initial_capacity)
 {
 	IntVector *o = malloc(sizeof(IntVector));
-	o -> data = calloc(initial_capacity, initial_capacity * sizeof(int));
-	o -> size = 0;
-	o -> capacity = initial_capacity;
+	if (o != NULL) {
+		o -> data = calloc(initial_capacity, initial_capacity * sizeof(int));
+		if (o -> data != NULL) {
+			o -> size = 0;
+			o -> capacity = initial_capacity;
+		} 
+	}
 	return o;
 } //Создаёт массив нулевого размера
 
 IntVector *int_vector_copy(const IntVector *v)
 {
 	IntVector *o = malloc(sizeof(IntVector));
-	o -> data = malloc(v -> capacity * sizeof(int));
-	memcpy(o -> data, v -> data, sizeof(v -> capacity));
-	o -> size = v -> size;
-	o -> capacity = v -> capacity;
+	if (o != NULL) {
+		o -> data = malloc(v -> capacity * sizeof(int));
+		if (o -> data != NULL) {
+			memcpy(o -> data, v -> data, sizeof(v -> capacity));
+			o -> size = int_vector_get_size(v);
+			o -> capacity = int_vector_get_capacity(v);
+		}
+	}
 	return o;
 } //Указатель на копию вектора v
 
@@ -45,7 +53,6 @@ void int_vector_set_item(IntVector *v, size_t index, int item)
 		printf("Выход за рамки вектора!");
 	} else {
 		v -> data[index - 1] = item;
-		v -> size = index;
 	}
 } //Присваивает элементу под index значеник item
 
@@ -62,10 +69,17 @@ size_t int_vector_get_capacity(const IntVector *v)
 int int_vector_push_back(IntVector *v, int item)
 {
 	if (v -> capacity == v -> size) {
-		v -> capacity = (v -> capacity) * 2;
-		v -> data = realloc(v -> data, v -> capacity * sizeof(int));
-		v -> size = (v -> size) + 1;
-		v -> data[(v -> size) - 1] = item;
+		if (v -> capacity == 0 && v -> size == 0) {
+			v -> capacity = 1;
+			v -> data = realloc(v -> data, v -> capacity * sizeof(int));
+			v -> size = (v -> size) + 1;
+			v -> data[(v -> size) - 1] = item;
+		} else {
+			v -> capacity = (v -> capacity) * 2;
+			v -> data = realloc(v -> data, v -> capacity * sizeof(int));
+			v -> size = (v -> size) + 1;
+			v -> data[(v -> size) - 1] = item;
+		}
 	} else {
 		v -> data[v -> size] = item;
 		v -> size = (v -> size) + 1;
@@ -90,7 +104,12 @@ void int_vector_pop_back(IntVector *v)
 
 int int_vector_shrink_to_fit(IntVector *v)
 {
-	v -> data = realloc(v -> data, (v -> size) * sizeof(int));
+	if (v -> size == 0) {
+		v -> capacity = v -> size;
+	} else {
+		v -> data = realloc(v -> data, (v -> size) * sizeof(int));
+	}
+
 	if (v -> data == NULL) {
 		return -1;
 	} else {
@@ -124,17 +143,22 @@ int int_vector_resize(IntVector *v, size_t new_size)
 
 int int_vector_reserve(IntVector *v, size_t new_capacity)
 {
-	int i = 0;
+	int i = 0, j;
 	if (new_capacity > v -> capacity) {
 		v -> data = realloc(v -> data, new_capacity * sizeof(int));
 		if (v -> data == NULL) {
 			 i = 1;
 		}
+		v -> capacity = new_capacity;
 	}
+	
+	for (j = v -> size; j < v -> capacity; ++j) {
+		v -> data[j] = 0;
+	}
+
 	if (i == 1) {
 		return -1;
 	} else {
-		v -> capacity = new_capacity;
 		return 0;
 	}
 } //Изменяет ёмкость массива
@@ -195,7 +219,7 @@ void MprintM(const IntVector *v)
 	}
 	printf("\n");
 
-	printf("Size: %d\n", v -> size);
-	printf("Capacity: %d\n", v -> capacity);
+	printf("Size: %zu\n", v -> size);
+	printf("Capacity: %zu\n", v -> capacity);
 	printf("\n");
 } //Вывод вектора

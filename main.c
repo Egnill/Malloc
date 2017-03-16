@@ -3,8 +3,9 @@
 
 int main()
 {
-	IntVector *p = int_vector_new(2);
-	int j, k = 0, i = 0;
+	IntVector *p = int_vector_new(0);
+	IntVector *w = NULL;
+	int j, k = 0, i = 0, e;
 	int index, item = 0, ent;
 	int new_s, new_c;
 	
@@ -12,6 +13,9 @@ int main()
 
 		printf("Vector operetion\n");
 		MprintM(p);
+		if (i == 1) {
+			MprintM(w);
+		}
 
 		printf("Enter option:\n");
 		printf("(1) <-- Add item\n");
@@ -22,11 +26,20 @@ int main()
 		printf("(6) <-- Shrink to fit\n");
 		printf("(7) <-- Resize\n");
 		printf("(8) <-- Reserve\n");
-		printf("(9) <-- Exit\n");
+		if (i == 0) {
+			printf("(9) <-- Vector copy\n");
+		} else {
+			printf("(9) <-- Vector delete\n");
+		}
+		printf("(0) <-- Exit\n");
 		printf("\n");
 		
 		printf("()--> ");
 		scanf("%d", &j);
+
+		if (j == 9 && i == 1) {
+			j = 10;
+		}
 
 		switch(j) {
 			case 1:
@@ -52,6 +65,9 @@ int main()
 			{
 				scanf("%d", &item);
 				ent = int_vector_push_back(p, item);
+				if (ent == -1) {
+					printf("Failed to allocate memory!");
+				}
 			}
 			break;
 			case 5:
@@ -62,21 +78,50 @@ int main()
 			case 6:
 			{
 				ent = int_vector_shrink_to_fit(p);
+				if (ent == -1) {
+					printf("Failed to allocate memory!");
+				}
+
 			}
 			break;
 			case 7:
 			{
 				scanf("%d", &new_s);
 				ent = int_vector_resize(p, new_s);
+				if (ent == -1) {
+					printf("Failed to allocate memory!");
+				}
 			}
 			break;
 			case 8:
 			{
 				scanf("%d", &new_c);
 				ent = int_vector_reserve(p, new_c);
+				if (ent == -1) {
+					printf("Failed to allocate memory!");
+				}
 			}
 			break;
 			case 9:
+			{
+				w = int_vector_copy(p);
+				if (ent == -1) {
+					printf("Failed to allocate memory!");
+				} else {
+					i = 1;
+					for (e = 0; e < p -> size; ++e) {
+						w -> data[e] = p -> data[e];
+					}
+				}
+			}
+			break;
+			case 10:
+			{
+				int_vector_free(w);
+				i = 0;
+			}
+			break;
+			case 0:
 			{
 				k = 1;
 			}
